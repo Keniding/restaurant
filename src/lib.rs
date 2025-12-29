@@ -62,6 +62,12 @@ mod back_of_house {
             }
         }
     }
+
+    #[derive(Debug)]
+    pub enum Appetizer {
+        Soup,
+        Salad
+    }
 }
 
 pub fn eat_at_restaurant_() {
@@ -75,6 +81,11 @@ pub fn eat_at_restaurant_() {
     // The next line won't compile if we uncomment it; we're not allowed
     // to see or modify the seasonal fruit that comes with the meal.
     // meal.seasonal_fruit = String::from("blueberries");
+
+    let order1 = back_of_house::Appetizer::Soup;
+    let order2 = back_of_house::Appetizer::Salad;
+    println!("Order {:?}", order1);
+    println!("Order {:?}", order2);
 }
 
 /*
