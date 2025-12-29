@@ -39,6 +39,17 @@ pub fn eat_at_restaurant() {
     front_of_house::hosting::add_to_waitlist();
 }
 
+fn _deliver_order() {}
+
+mod back_of_house {
+    fn _fix_incorrect_order() {
+        _cook_order();
+        super::_deliver_order();
+    }
+
+    fn _cook_order() {}
+}
+
 /*
 Por ejemplo, escribamos una biblioteca que proporcione la funcionalidad de un restaurante. Definiremos las firmas de las funciones, pero dejaremos sus cuerpos vacíos para centrarnos en la organización del código en lugar de en la implementación del restaurante.
 
