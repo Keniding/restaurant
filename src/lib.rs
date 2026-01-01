@@ -406,3 +406,81 @@ El operador glob se utiliza a menudo durante las pruebas para llevar todo lo que
 // Rutas anidadas
 // use std::{cmp::Ordering, slice};
 // use std::io::{Result, Write};
+
+/*
+Separar módulos en archivos diferentes
+Hasta ahora, todos los ejemplos de este capítulo definieron varios módulos en un solo archivo. Cuando los módulos sean grandes, conviene trasladar sus definiciones a un archivo aparte para facilitar la navegación por el código.
+
+Por ejemplo, comencemos con el código del Listado 7-17, que tenía varios módulos de restaurante. Extraeremos los módulos a archivos en lugar de tenerlos todos definidos en el archivo raíz del cajón. En este caso, el archivo raíz del cajón es src/lib.rs , pero este procedimiento también funciona con cajones binarios cuyo archivo raíz es src/main.rs .
+
+Primero, extraeremos el front_of_housemódulo a su propio archivo. Elimine el código entre llaves del front_of_housemódulo, dejando solo la mod front_of_house;declaración, para que src/lib.rs contenga el código que se muestra en el Listado 7-21. Tenga en cuenta que esto no se compilará hasta que creemos el archivo src/front_of_house.rs en el Listado 7-22.
+
+Nombre de archivo: src/lib.rs
+¡Este código no se compila!
+mod front_of_house;
+
+pub use crate::front_of_house::hosting;
+
+pub fn eat_at_restaurant() {
+    hosting::add_to_waitlist();
+}
+Listado 7-21 : Declaración del front_of_housemódulo cuyo cuerpo estará en src/front_of_house.rs
+A continuación, coloque el código entre llaves en un nuevo archivo llamado src/front_of_house.rs , como se muestra en el Listado 7-22. El compilador sabe que debe buscar en este archivo porque encontró la declaración del módulo en la raíz del paquete con el nombre front_of_house.
+
+Nombre del archivo: src/front_of_house.rs
+pub mod hosting {
+    pub fn add_to_waitlist() {}
+}
+Listado 7-22 : Definiciones dentro del front_of_housemódulo en src/front_of_house.rs
+Tenga en cuenta que solo necesita cargar un archivo mediante una moddeclaración una vez en el árbol de módulos. Una vez que el compilador sabe que el archivo forma parte del proyecto (y dónde se encuentra el código en el árbol de módulos gracias a la ubicación de la mod declaración), los demás archivos del proyecto deben hacer referencia al código del archivo cargado mediante la ruta a su declaración, como se explica en la sección "Rutas para hacer referencia a un elemento en el árbol de módulos" . En otras palabras, nomod se trata de una operación de "inclusión" que quizás haya visto en otros lenguajes de programación.
+
+A continuación, extraeremos el hostingmódulo a su propio archivo. El proceso es ligeramente diferente, ya que hostinges un módulo hijo de front_of_house, no del módulo raíz. Colocaremos el archivo for hostingen un nuevo directorio que llevará el nombre de sus antecesores en el árbol de módulos, en este caso src/front_of_house .
+
+Para comenzar a movernos hosting, cambiamos src/front_of_house.rs para que contenga solo la declaración del hostingmódulo:
+
+Nombre del archivo: src/front_of_house.rs
+pub mod hosting;
+Luego, creamos un directorio src/front_of_house y un archivo hosting.rs para contener las definiciones realizadas en el hostingmódulo:
+
+Nombre de archivo: src/front_of_house/hosting.rs
+pub fn add_to_waitlist() {}
+Si, en cambio, colocamos hosting.rs en el directorio src , el compilador esperaría que el código de hosting.rs estuviera en un hostingmódulo declarado en la raíz del paquete y no como un front_of_housemódulo secundario. Las reglas del compilador sobre qué archivos revisar para el código de cada módulo hacen que los directorios y archivos coincidan más estrechamente con el árbol de módulos.
+
+Rutas de archivo alternativas
+Hasta ahora hemos cubierto las rutas de archivo más comunes que usa el compilador de Rust, pero Rust también admite un estilo más antiguo de ruta de archivo. Para un módulo llamado front_of_housedeclarado en la raíz del paquete, el compilador buscará el código del módulo en:
+
+src/front_of_house.rs (lo que cubrimos)
+src/front_of_house/mod.rs (estilo antiguo, ruta aún compatible)
+Para un módulo llamado hostingque es un submódulo de front_of_house, el compilador buscará el código del módulo en:
+
+src/front_of_house/hosting.rs (lo que cubrimos)
+src/front_of_house/hosting/mod.rs (estilo antiguo, ruta aún compatible)
+Si usas ambos estilos para el mismo módulo, recibirás un error de compilación. Usar ambos estilos combinados para diferentes módulos del mismo proyecto está permitido, pero podría resultar confuso para quienes navegan por el proyecto.
+
+La principal desventaja del estilo que utiliza archivos llamados mod.rs es que su proyecto puede terminar con muchos archivos llamados mod.rs , lo que puede resultar confuso cuando los tiene abiertos en su editor al mismo tiempo.
+
+Hemos movido el código de cada módulo a un archivo separado, y el árbol de módulos permanece igual. Las llamadas a funciones eat_at_restaurantfuncionarán sin modificaciones, aunque las definiciones se encuentren en archivos diferentes. Esta técnica permite mover módulos a nuevos archivos a medida que aumentan de tamaño.
+
+Tenga en cuenta que la pub use crate::front_of_house::hostingdeclaración en src/lib.rs tampoco ha cambiado ni useafecta los archivos que se compilan como parte del crate. La modpalabra clave declara módulos, y Rust busca el código que contiene en un archivo con el mismo nombre.
+
+Resumen
+Rust permite dividir un paquete en varias cajas y una caja en módulos para que puedas hacer referencia a los elementos definidos en un módulo desde otro. Puedes hacerlo especificando rutas absolutas o relativas. Estas rutas se pueden incluir en el ámbito de aplicación mediante una usedeclaración, lo que permite usar una ruta más corta para múltiples usos del elemento en ese ámbito. El código del módulo es privado por defecto, pero puedes hacer públicas las definiciones añadiendo la pubpalabra clave.
+
+En el próximo capítulo, veremos algunas estructuras de datos de recopilación en la biblioteca estándar que puedes usar en tu código perfectamente organizado.
+ */
+//Implementación con archivo separado
+mod front_of_house_with_file;
+
+pub use crate::front_of_house_with_file::hosting_with_file;
+
+pub fn eat_at_restaurant_with_file() {
+    hosting_with_file::add_to_waitlist();
+}
+
+// Segmentación de archivos en archivos y carpetas referenciando con el mismo nombre carpeta y archivo
+mod front_of_house_with_fragmentation;
+pub use crate::front_of_house_with_fragmentation::hosting_with_fragmentation;
+
+pub fn eat_at_restaurant_with_fragmentation() {
+    hosting_with_fragmentation::add_to_waitlist();
+}
